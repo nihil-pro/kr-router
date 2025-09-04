@@ -1,0 +1,15 @@
+{
+  "include": ["eslint.config.mjs", "lint-staged.config.mjs"],
+  "exclude": ["src/test/*"],
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["ES2022", "DOM.Iterable", "DOM"],
+    "outDir": "dist",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+  }
+}
