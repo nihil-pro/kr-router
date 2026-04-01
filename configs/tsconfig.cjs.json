@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["../packages/**/*"],
+  "include": ["../src"],
+  "exclude": ["../src/react", "../src/preact"],
   "compilerOptions": {
     "outDir": "../dist/cjs",
     "module": "commonjs",

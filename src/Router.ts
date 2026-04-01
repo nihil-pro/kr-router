@@ -64,7 +64,7 @@ export class AppRouter<T extends RouterConfig> extends EventTarget {
     for (const [route, config] of entries) {
 
       const previous = config.result;
-      config.result = config.pattern.exec(location.href) as RoutePatternResult<any>;
+      config.result = config.pattern.exec(location.href) as RoutePatternResult<any, any>;
       const current = config.result;
 
 
@@ -82,7 +82,6 @@ export class AppRouter<T extends RouterConfig> extends EventTarget {
         if (!config.pattern.pathname.endsWith('*?')) {
           // currently, we check only path segments and ignore query params or hash
           for (const segment in current.pathname.groups) {
-            // @ts-ignore
             if (current.pathname.groups[segment] !== previous.pathname.groups[segment]) {
               shouldReport = true;
               break;

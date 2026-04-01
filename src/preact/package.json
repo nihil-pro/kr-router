@@ -1,0 +1,13 @@
+{
+  "name": "kr-router/preact",
+  "type": "module",
+  "module": "./index.js",
+  "types": "../dist/types/preact/index.d.ts",
+  "sideEffects": false,
+  "version": "0.0.1-alpha.3",
+  "main": "../dist/esm/preact/index.js",
+  "peerDependencies": {
+    "preact": "*",
+    "kr-router": "latest"
+  }
+}

@@ -1,5 +1,6 @@
 /src
 /node_modules
+/dist/configs
 .idea
 
 *.log
@@ -13,6 +14,7 @@ configs/lint-staged.config.mjs
 
 .nyc_output
 .github
+.claude
 .mocharc.json
 tsconfig.json
 tsconfig.*.json

@@ -1,17 +1,26 @@
 type ParseParam<ParamPart extends string> =
-// Check for optional parameter :id?
-  ParamPart extends `${infer ParamName}?`
+  // Check for regex + optional modifier :id(regex)?
+  ParamPart extends `${infer ParamName}(${string})?`
     ? { [K in ParamName]?: string }
-    // Check for wildcard with modifier :id* or :id+
-    : ParamPart extends `${infer ParamName}*`
+    // Check for regex + zero-or-more modifier :id(regex)*
+    : ParamPart extends `${infer ParamName}(${string})*`
       ? { [K in ParamName]: string[] }
-      : ParamPart extends `${infer ParamName}+`
+      // Check for regex + one-or-more modifier :id(regex)+
+      : ParamPart extends `${infer ParamName}(${string})+`
         ? { [K in ParamName]: string[] }
-        // Check for regex constraint :id(regex) - extract just the name
-        : ParamPart extends `${infer ParamName}(${string})`
+        // Check for regex constraint :id(regex) or :id(regex){...} - extract just the name
+        : ParamPart extends `${infer ParamName}(${string})${string}`
           ? { [K in ParamName]: string }
-          // Simple named parameter
-          : { [K in ParamPart]: string };
+          // Check for optional parameter :id?
+          : ParamPart extends `${infer ParamName}?`
+            ? { [K in ParamName]?: string }
+            // Check for wildcard with modifier :id* or :id+
+            : ParamPart extends `${infer ParamName}*`
+              ? { [K in ParamName]: string[] }
+              : ParamPart extends `${infer ParamName}+`
+                ? { [K in ParamName]: string[] }
+                // Simple named parameter
+                : { [K in ParamPart]: string };
 
 type ExtractRouteParams<T extends string> =
   T extends `${string}:${infer Param}/${infer Rest}`
@@ -19,16 +28,6 @@ type ExtractRouteParams<T extends string> =
     : T extends `${string}:${infer Param}`
       ? ParseParam<Param>
       : {};
-
-// Handle wildcards without colon (/*)
-type ExtractWildcards<T extends string> =
-// @ts-ignore
-  T extends `${infer Start}/*${infer Rest}`
-    ? Rest extends ''
-      ? { wildcard: string[] }
-      : { wildcard: string[] } & ExtractWildcards<Rest>
-    : {};
-
 
 /** Creates a typed object based on string input
  * @example
@@ -42,15 +41,26 @@ type ExtractWildcards<T extends string> =
  *   baz: string[]
  * }
  * */
-type RouteParams<T extends string> = ExtractRouteParams<T> & ExtractWildcards<T>;
+type RouteParams<T extends string> = ExtractRouteParams<T>;
 
 type LoaderComponent<T extends RouteConfig> =
   Awaited<ReturnType<T['loader']>> extends { default: infer C } ? C : never;
 
-interface RouteConfig<C = any> {
+interface RouteConfig<C = any, Q extends Record<string, string | undefined> = Record<never, never>> {
   path: string;
+  /**
+   * Type-only descriptor for expected query string parameters.
+   * Not used at runtime — assign with `{} as YourQueryType` to annotate the type.
+   * @example
+   * query: {} as { page?: string; filter?: string }
+   */
+  query?: Q;
   loader(): Promise<{ default: C }>;
 }
+
+type QueryOf<T> = T extends { query: infer Q extends Record<string, string | undefined> }
+  ? Q
+  : Record<never, never>;
 
 export interface RouterConfig {
   routes: Record<string, RouteConfig>;
@@ -75,10 +85,17 @@ export interface RouterConfig {
 }
 
 
-export interface RoutePatternResult<T extends Record<string, string | undefined>> extends URLPatternResult {
+export interface RoutePatternResult<
+  P extends Record<string, string | undefined>,
+  Q extends Record<string, string | undefined> = Record<never, never>
+> extends URLPatternResult {
   pathname: {
     input: string;
-    groups: T
+    groups: P
+  }
+  search: {
+    input: string;
+    groups: Q
   }
 }
 
@@ -96,7 +113,7 @@ export type RouteState<T extends RouteConfig> =
   error: Error | null;
 
   /**  @see https://developer.mozilla.org/en-US/docs/Web/API/URLPattern/exec#return_value */
-  result: RoutePatternResult<RouteParams<T['path']>>;
+  result: RoutePatternResult<RouteParams<T['path']>, QueryOf<T>>;
 }
   | {
   pattern: URLPattern

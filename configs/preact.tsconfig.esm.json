@@ -1,9 +1,15 @@
 {
   "extends": "../tsconfig.json",
+  "include": ["../src/preact"],
   "compilerOptions": {
     "outDir": "../dist/esm/preact",
+    "rootDir": "../src/preact",
     "target": "esnext",
-    "module": "ES2022"
-  },
-  "include": ["../packages/preact"]
+    "module": "ES2022",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "paths": {
+      "kr-router": ["dist/types/index"]
+    }
+  }
 }

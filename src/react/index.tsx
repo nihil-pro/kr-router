@@ -1,5 +1,6 @@
-import { RouterRoutes, AppRouter } from 'kr-router';
-import React, { Fragment, ComponentType, useEffect, useState } from 'react';
+import type { RouterRoutes, AppRouter } from 'kr-router';
+import React from 'react';
+import { Fragment, ComponentType, useEffect, useState } from 'react';
 
 function Route<T extends AppRouter<any>, K extends keyof RouterRoutes<RouterConfig<T>>>(
   { route, router, name, ErrorComponent }: RouteProps<T, K>

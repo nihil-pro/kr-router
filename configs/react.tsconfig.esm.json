@@ -1,10 +1,14 @@
 {
   "extends": "../tsconfig.json",
+  "include": ["../src/react"],
   "compilerOptions": {
     "outDir": "../dist/esm/react",
+    "rootDir": "../src/react",
     "target": "esnext",
     "module": "ES2022",
-    "jsx": "react"
-  },
-  "include": ["../src/react"]
+    "jsx": "react",
+    "paths": {
+      "kr-router": ["dist/types/index"]
+    }
+  }
 }
