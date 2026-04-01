@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/esm/react",
+    "target": "esnext",
+    "module": "ES2022",
+    "jsx": "react"
+  },
+  "include": ["../src/react"]
+}
