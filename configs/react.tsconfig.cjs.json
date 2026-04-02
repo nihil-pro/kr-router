@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["../src/react"],
+  "compilerOptions": {
+    "outDir": "../dist/cjs/react",
+    "rootDir": "../src/react",
+    "module": "commonjs",
+    "target": "ES2022",
+    "jsx": "react",
+    "paths": {
+      "kr-router": ["dist/types/index"]
+    }
+  }
+}

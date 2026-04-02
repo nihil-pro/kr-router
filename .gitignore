@@ -10,6 +10,12 @@
 # JetBrains IDE
 .idea/
 
+# JetBrains auto-generated files next to source
+src/**/*.js
+src/**/*.d.ts
+src/**/*.d.ts.map
+src/**/*.js.map
+
 # VSCode IDE
 .vscode
 

@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["../src/preact"],
+  "compilerOptions": {
+    "outDir": "../dist/types/preact",
+    "rootDir": "../src/preact",
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "paths": {
+      "kr-router": ["dist/types/index"]
+    }
+  }
+}

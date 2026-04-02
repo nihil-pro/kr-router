@@ -1,15 +1,21 @@
 {
-  "include": ["eslint.config.mjs", "lint-staged.config.mjs"],
+  "include": ["src/**/*", "scripts", "eslint.config.mjs", "lint-staged.config.mjs"],
   "exclude": ["src/test/*"],
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "lib": ["ES2022", "DOM.Iterable", "DOM"],
+    "lib": ["esnext", "DOM.Iterable", "DOM"],
     "outDir": "dist",
     "moduleResolution": "node",
     "skipLibCheck": true,
     "removeComments": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "jsx": "react",
+    "strict": true,
+    "strictNullChecks": true,
+    "paths": {
+      "kr-router": ["src/index.ts"]
+    }
   }
 }

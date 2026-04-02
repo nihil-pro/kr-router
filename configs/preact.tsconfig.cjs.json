@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["../src/preact"],
+  "compilerOptions": {
+    "outDir": "../dist/cjs/preact",
+    "rootDir": "../src/preact",
+    "module": "commonjs",
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "paths": {
+      "kr-router": ["dist/types/index"]
+    }
+  }
+}

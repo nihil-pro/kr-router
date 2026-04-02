@@ -1,11 +1,13 @@
 {
   "name": "kr-router",
-  "version": "0.0.1-alpha.2",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "prepare": "husky",
     "clean": "rm -rf dist",
-    "build:main": "tsc -b tsconfig.cjs.json tsconfig.esm.json tsconfig.types.json",
+    "build:core": "tsc -b configs/tsconfig.cjs.json configs/tsconfig.esm.json configs/tsconfig.types.json",
+    "build:subpackages": "tsc -b configs/react.tsconfig.cjs.json configs/react.tsconfig.esm.json configs/react.tsconfig.types.json configs/preact.tsconfig.cjs.json configs/preact.tsconfig.esm.json configs/preact.tsconfig.types.json",
+    "build:main": "npm run build:core && npm run build:subpackages",
     "generate": "node --import tsx ./scripts/genPackageFiles.ts",
     "build": "npm-run-all clean build:main",
     "test-watch": "npm run build && node --import tsx --test --test-reporter=spec --watch src/test/*.test.*",
@@ -16,28 +18,37 @@
     "gen-size-badge": "node --import tsx ./scripts/genSizeBadges.ts",
     "test-ts": "c8 node --import tsx --test --experimental-strip-types --test-reporter=spec ./src/**/*.test.ts && npm run gen-coverage-badge"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "routing",
+    "router",
+    "SPA",
+    "reactive router",
+    "react router",
+    "preact router",
+    "vue router",
+    "solid-js router"
+  ],
+  "author": "Roman Konstantin",
+  "license": "MIT",
   "description": "",
-  "peerDependencies": {
-    "kr-observable": "latest"
-  },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "devDependencies": {
     "@espcom/esbuild-plugin-compress": "1.2.0",
     "@espcom/eslint-config": "latest",
-    "@types/node": "22.8.6",
+    "@types/node": "^24.12.0",
+    "@types/react": "^19.2.14",
     "badge-maker": "4.0.0",
     "c8": "10.1.2",
     "esbuild": "0.25.5",
     "husky": "9.1.5",
     "lint-staged": "15.2.9",
     "npm-run-all": "^4.1.5",
-    "tsx": "^4.19.2",
-    "typescript": "^4.9.5",
+    "preact": "^10.29.0",
+    "react": "^19.2.4",
+    "tsx": "4.21.0",
+    "typescript": "^5.3.3",
     "xml-splitter": "1.2.1"
   },
   "sideEffect": false,
@@ -46,6 +57,16 @@
       "types": "./dist/types/index.d.ts",
       "require": "./dist/cjs/index.js",
       "import": "./dist/esm/index.js"
+    },
+    "./react": {
+      "types": "./dist/types/react/index.d.ts",
+      "require": "./dist/cjs/react/index.js",
+      "import": "./dist/esm/react/index.js"
+    },
+    "./preact": {
+      "types": "./dist/types/preact/index.d.ts",
+      "require": "./dist/cjs/preact/index.js",
+      "import": "./dist/esm/preact/index.js"
     }
   }
 }

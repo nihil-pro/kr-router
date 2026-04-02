@@ -1,0 +1,13 @@
+{
+  "name": "kr-router/react",
+  "type": "module",
+  "module": "./index.js",
+  "types": "../dist/types/react/index.d.ts",
+  "sideEffects": false,
+  "version": "3.0.0",
+  "main": "../dist/esm/react/index.js",
+  "peerDependencies": {
+    "react": "*",
+    "kr-router": "latest"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["../src"],
+  "exclude": ["../src/react", "../src/preact"],
+  "compilerOptions": {
+    "outDir": "../dist/cjs",
+    "module": "commonjs",
+    "target": "ES2022"
+  }
+}
