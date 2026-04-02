@@ -2,6 +2,7 @@
 /node_modules
 /dist/configs
 .idea
+/configs
 
 *.log
 yarn.lock

@@ -1,31 +1,44 @@
 import type { RouterRoutes, AppRouter } from 'kr-router';
-import React from 'react';
-import { Fragment, ComponentType, useEffect, useState } from 'react';
+import React, { Component, Fragment } from 'react';
+import type { ComponentType } from 'react';
 
-function Route<T extends AppRouter<any>, K extends keyof RouterRoutes<RouterConfig<T>>>(
-  { route, router, name, ErrorComponent }: RouteProps<T, K>
-) {
-  const [, rerender] = useState<any>(null);
-  router.addEventListener(name, rerender)
+class Route<T extends AppRouter<any>, K extends keyof RouterRoutes<RouterConfig<T>>> extends Component<RouteProps<T, K>> {
+  #rerender = () => this.forceUpdate();
 
-  useEffect(() => () => router.removeEventListener(name, rerender), [router]);
+  constructor(props: RouteProps<T, K>) {
+    super(props);
+    props.router.addEventListener(props.name, this.#rerender);
+  }
 
-  if (!route.matches) return null;
-  if (route.error) return <ErrorComponent error={route.error} />;
+  componentWillUnmount() {
+    this.props.router.removeEventListener(this.props.name, this.#rerender);
+  }
 
-  const Component = route.component as any;
-  if (!Component) return null;
-  return <Component />;
+  render() {
+    if (!this.props.route.matches) return null;
+    if (this.props.route.error) return <this.props.ErrorComponent error={this.props.route.error} />;
+    const Comp = this.props.route.component as any;
+    if (!Comp) return null;
+    return <Comp />;
+  }
 }
 
+class NotFound<T extends AppRouter<any>> extends Component<NotFoundProps<T>> {
+  #rerender = () => this.forceUpdate();
 
-function NotFound<T extends AppRouter<any>>({ Component, router }: NotFoundProps<T>) {
-  const [, rerender] = useState<any>(null);
-  router.addEventListener('notfound', rerender);
-  useEffect(() => () => router.removeEventListener('notfound', rerender), [router]);
+  constructor(props: NotFoundProps<T>) {
+    super(props);
+    props.router.addEventListener('notfound', this.#rerender);
+  }
 
-  if (router.notFound) return <Component />
-  return null;
+  componentWillUnmount() {
+    this.props.router.removeEventListener('notfound', this.#rerender);
+  }
+
+  render() {
+    if (!this.props.router.notFound) return null;
+    return <this.props.Component />;
+  }
 }
 
 export function ReactRouter<T extends AppRouter<any>>(

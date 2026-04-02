@@ -47,7 +47,9 @@ type LoaderComponent<T extends RouteConfig> =
   Awaited<ReturnType<T['loader']>> extends { default: infer C } ? C : never;
 
 interface RouteConfig<C = any, Q extends Record<string, string | undefined> = Record<never, never>> {
+
   path: string;
+
   /**
    * Type-only descriptor for expected query string parameters.
    * Not used at runtime — assign with `{} as YourQueryType` to annotate the type.
@@ -127,5 +129,5 @@ export type RouteState<T extends RouteConfig> =
 
 
 export type RouterRoutes<T extends RouterConfig> = {
-  [K in keyof T['routes']]: RouteState<T['routes'][K]> & RouteConfig;
+  [K in keyof T['routes']]: RouteState<T['routes'][K]> & RouteConfig & { name: K };
 }

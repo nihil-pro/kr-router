@@ -15,10 +15,9 @@ class Route<T extends AppRouter<any>, K extends keyof RouterRoutes<RouterConfig<
   }
 
   render() {
-    const { route, ErrorComponent } = this.props;
-    if (!route.matches) return null;
-    if (route.error) return <ErrorComponent error={route.error} />;
-    const Comp = route.component as any;
+    if (!this.props.route.matches) return null;
+    if (this.props.route.error) return <this.props.ErrorComponent error={this.props.route.error} />;
+    const Comp = this.props.route.component as any;
     if (!Comp) return null;
     return <Comp />;
   }
@@ -37,9 +36,8 @@ class NotFound<T extends AppRouter<any>> extends Component<NotFoundProps<T>> {
   }
 
   render() {
-    const { router, Component: Comp } = this.props;
-    if (!router.notFound) return null;
-    return <Comp />;
+    if (!this.props.router.notFound) return null;
+    return <this.props.Component />;
   }
 }
 
