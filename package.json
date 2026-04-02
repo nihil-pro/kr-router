@@ -18,9 +18,18 @@
     "gen-size-badge": "node --import tsx ./scripts/genSizeBadges.ts",
     "test-ts": "c8 node --import tsx --test --experimental-strip-types --test-reporter=spec ./src/**/*.test.ts && npm run gen-coverage-badge"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "routing",
+    "router",
+    "SPA",
+    "reactive router",
+    "react router",
+    "preact router",
+    "vue router",
+    "solid-js router"
+  ],
+  "author": "Roman Konstantin",
+  "license": "MIT",
   "description": "",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
