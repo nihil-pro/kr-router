@@ -4,10 +4,20 @@ import type { RouterRoutes, AppRouter } from 'kr-router';
 
 class Route<T extends AppRouter<any>, K extends keyof RouterRoutes<RouterConfig<T>>> extends Component<RouteProps<T, K>> {
   #rerender = () => this.forceUpdate();
+  state: { error: Error | null } = { error: null }
 
   constructor(props: RouteProps<T, K>) {
     super(props);
     props.router.addEventListener(props.name, this.#rerender);
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error(`[kr-router]: Route<${this.props.route.name.toString()}>`, error, errorInfo);
+  }
+
+  static getDerivedStateFromError(error: unknown) {
+    if (error instanceof Error) return { error };
+    return { error: new Error('An error has occurred during render') };
   }
 
   componentWillUnmount() {
@@ -16,10 +26,11 @@ class Route<T extends AppRouter<any>, K extends keyof RouterRoutes<RouterConfig<
 
   render() {
     if (!this.props.route.matches) return null;
-    if (this.props.route.error) return <this.props.ErrorComponent error={this.props.route.error} />;
-    const Comp = this.props.route.component as any;
-    if (!Comp) return null;
-    return <Comp />;
+    const error = this.props.route.error || this.state.error;
+    if (error) return <this.props.ErrorComponent error={error} />;
+    const RouteComponent = this.props.route.component as any;
+    if (!RouteComponent) return null;
+    return <RouteComponent />;
   }
 }
 

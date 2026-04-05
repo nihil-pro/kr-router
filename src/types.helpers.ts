@@ -109,23 +109,22 @@ export interface RoutePatternResult<
  * */
 export type RouteState<T extends RouteConfig> =
   | {
-  pattern: URLPattern
-  matches: true;
-  component: LoaderComponent<T> | null;
-  error: Error | null;
+    pattern: URLPattern
+    matches: true;
+    component: LoaderComponent<T> | null;
+    error: Error | null;
 
-  /**  @see https://developer.mozilla.org/en-US/docs/Web/API/URLPattern/exec#return_value */
-  result: RoutePatternResult<RouteParams<T['path']>, QueryOf<T>>;
-}
-  | {
-  pattern: URLPattern
-  matches: false;
-  component: LoaderComponent<T> | null;
-  error: Error | null;
+    /**  @see https://developer.mozilla.org/en-US/docs/Web/API/URLPattern/exec#return_value */
+    result: RoutePatternResult<RouteParams<T['path']>, QueryOf<T>>;
+  } | {
+    pattern: URLPattern
+    matches: false;
+    component: LoaderComponent<T> | null;
+    error: Error | null;
 
-  /** null, because pattern didn't match location */
-  result: null;
-};
+    /** null, because pattern didn't match location */
+    result: null;
+  }
 
 
 export type RouterRoutes<T extends RouterConfig> = {

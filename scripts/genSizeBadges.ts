@@ -34,7 +34,7 @@ function afterBuild(result: BuildResult, type: 'esm' | 'cjs', name: string) {
   const svgPath = path.resolve(assetsPath, `${type}.svg`);
 
   // eslint-disable-next-line no-console
-  console.log(name, `Size ${type} gzipped ${sizes.gz}`); // ${sizes.js}
+  console.log(name, `Size ${type} gzipped ${sizes.gz}`, result); // ${sizes.js}
 
   const svg = makeBadge({
     label: type.toUpperCase(), // ,`Size (${type})`,
@@ -67,10 +67,18 @@ const buildConfig: BuildOptions = {
 };
 
 await Promise.all([
+  // esbuild
+  //   .build({
+  //     ...buildConfig,
+  //     entryPoints: [path.resolve(pkg.exports['.'].import)],
+  //     format: 'esm',
+  //     outdir: 'assets/esm',
+  //   })
+  //   .then((res) => afterBuild(res, 'esm', '')),
   esbuild
     .build({
       ...buildConfig,
-      entryPoints: [path.resolve(pkg.exports['.'].import)],
+      entryPoints: [path.resolve(pkg.exports['./react'].import)],
       format: 'esm',
       outdir: 'assets/esm',
     })
