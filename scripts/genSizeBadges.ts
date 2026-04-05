@@ -67,22 +67,22 @@ const buildConfig: BuildOptions = {
 };
 
 await Promise.all([
-  // esbuild
-  //   .build({
-  //     ...buildConfig,
-  //     entryPoints: [path.resolve(pkg.exports['.'].import)],
-  //     format: 'esm',
-  //     outdir: 'assets/esm',
-  //   })
-  //   .then((res) => afterBuild(res, 'esm', '')),
   esbuild
     .build({
       ...buildConfig,
-      entryPoints: [path.resolve(pkg.exports['./react'].import)],
+      entryPoints: [path.resolve(pkg.exports['.'].import)],
       format: 'esm',
       outdir: 'assets/esm',
     })
     .then((res) => afterBuild(res, 'esm', '')),
+  // esbuild
+  //   .build({
+  //     ...buildConfig,
+  //     entryPoints: [path.resolve(pkg.exports['./react'].import)],
+  //     format: 'esm',
+  //     outdir: 'assets/esm',
+  //   })
+  //   .then((res) => afterBuild(res, 'esm', '')),
   esbuild
     .build({
       ...buildConfig,
