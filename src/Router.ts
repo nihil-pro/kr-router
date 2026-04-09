@@ -188,7 +188,7 @@ export class AppRouter<T extends RouterConfig> extends EventTarget {
     if (!anchor) return;
 
     if (anchor.origin !== location.origin) return;
-    if (anchor.target || anchor.download) return;
+    if (anchor.hasAttribute('target') || anchor.hasAttribute('download')) return;
     event.preventDefault();
     this.navigate((anchor.pathname + anchor.search + anchor.hash) as `/${string}`)
   }
