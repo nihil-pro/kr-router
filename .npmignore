@@ -1,6 +1,7 @@
 /src
 /node_modules
 /dist/configs
+/dist/**/*.tsbuildinfo
 .idea
 /configs
 
