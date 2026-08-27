@@ -1,6 +1,6 @@
 {
   "include": ["src/**/*", "scripts", "eslint.config.mjs", "lint-staged.config.mjs"],
-  "exclude": ["src/test/*"],
+  "exclude": ["src/**/*.test.ts"],
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
