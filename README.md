@@ -5,11 +5,14 @@
 [![size-esm](https://github.com/nihil-pro/kr-router/blob/main/assets/esm.svg)](https://bundlephobia.com/package/kr-router)
 [![size-cjs](https://github.com/nihil-pro/kr-router/blob/main/assets/cjs.svg)](https://bundlephobia.com/package/kr-router)
 
-1. Framework-agnostic;
-2. No `<Link />` component needed, just use regular `<a href="/">` tags;
-3. Routes are matched against `location.href` using [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern);
-4. The router extends a fully typed `EventTarget`, you can subscribe to route changes by route name;
-5. Multiple instances can exist independently on the same page, useful for microservices.
+Built on top of [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) and [Navigation](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API) API, this event-driven router is designed to decouple routing from rendering.
+
+1. Routes are matched against their regex pattern strictly. No conflicts, declaration order doesn't matter.
+2. No `<Link />` component needed, just use regular anchors – `<a href="/">`;
+3. An instance or router is fully typed `EventTarget`, you can subscribe to route by its name and get typed events and typed parameters – anywhere you want;
+4. Multiple instances can coexist independently; useful for microservices.
+5. Supports reactive configuration object.
+6. Code splitting out of the box.
 
 ## Built in bindings
 - React <sup>0.4 KB</sup>
@@ -23,31 +26,45 @@ npm install kr-router
 ```
 
 ## Basic usage
-
 Create a AppRouter instance
 ```ts
 import { AppRouter } from 'kr-router';
 
 const router = new AppRouter({
-  routes: {
-    home: {
-      path: '/',
-      loader: () => import('./pages/Home'),
-    },
-    about: {
-      path: '/about',
-      loader: () => import('./pages/About'),
-    },
-    user: {
-      path: '/users/:id',
-      query: {} as { tab?: string },
-      loader: () => import('./pages/User'),
-    },
-  } as const,
+  home: {
+    path: '/',
+    loader: () => import('./pages/Home'),
+  },
+  about: {
+    path: '/about',
+    loader: () => import('./pages/About'),
+  },
+  user: {
+    path: '/users/:id',
+    query: {} as { tab?: string },
+    loader: () => import('./pages/User'),
+  },
 } as const);
-
 ```
-And pass it to the appropriate adapter:
+and listen for route changes anywhere you want
+```ts
+router.addEventListener('user', (event) => {
+  if (event.state.matches) {
+    // result is typed!
+    event.state.result.pathname.groups.id; // string
+  }
+});
+
+router.addEventListener('notfound', () => {
+  console.log(router.notFound); // boolean
+});
+
+// Clean up when done
+router.removeEventListener('user', handler);
+```
+No "missed event" problems. When you add a listener, it fires immediately with the current route state.
+
+## Usage with React or Preact
 ```tsx
 import { ReactRouter } from 'kr-router/react';
 
@@ -62,6 +79,7 @@ function App() {
   );
 }
 ```
+And you can easy built own adapter for your framework.
 
 ### Navigate using `<a href={path} >` tag
 ```tsx
@@ -82,26 +100,6 @@ router.navigate('/users/42');
 // Replace current history entry
 router.navigate('/users/42?tab=settings', { replace: true });
 
-// Navigate through history
-router.navigate(-1); // back
-router.navigate(1);  // forward
-```
-
-### Listening to route changes anywhere you want
-```ts
-router.addEventListener('user', (event) => {
-  if (event.state.matches) {
-    // result is typed!
-    event.state.result.pathname.groups.id; // string
-  }
-});
-
-router.addEventListener('notfound', () => {
-  console.log(router.notFound); // boolean
-});
-
-// Clean up when done
-router.removeEventListener('user', handler);
 ```
 
 
@@ -132,13 +130,11 @@ function UserPage() {
 ```ts
 // With kr-router — validate once, forget it 😎
 const router = new AppRouter({
-  routes: {
-    user: {
-      path: '/users/:id([0-9]+)',  // only numeric IDs reach your component
-      loader: () => import('./UserPage'),
-    },
+  user: {
+    path: '/users/:id([0-9]+)',  // only numeric IDs reach your component
+    loader: () => import('./UserPage'),
   },
-})
+} as const)
 ```  
 
 ### Examples:
@@ -154,25 +150,6 @@ const router = new AppRouter({
 | `/date/:year(\d{4})/:month(\d{2})` | `/date/2024/03` | `/date/24/3` | `{ year: "2024", month: "03" }` |
 | `/docs/:section*/:page` | `/docs/api/router/overview` | N/A (matches any depth) | `{ section: ["api", "router"], page: "overview" }` |
 
-
-
-## Link interception
-
-By default, the router intercepts clicks on `<a>` elements if:
-- href has the same origin
-- no `download` attribute
-- no `target` attribute
-- no modifier keys (`Ctrl`, `Shift`, `Alt`, `Cmd`) are pressed
-- no middle mouse button is pressed
-
-This prevents full page reloads. To disable interception:
-
-```ts
-const router = new AppRouter({
-  interceptLinks: false,
-  // rest of config
-});
-```
 
 Always use absolute paths in `href`:
 ```html
@@ -196,8 +173,6 @@ user: {
 After the route matches, `event.state.result.search.groups` will be typed as `{ tab?: string; sort?: string }`.
 
 
-> **Requirements:** `URLPattern` is supported in all modern browsers (Chrome 95+, Edge 95+, Firefox 142+, Safari 26+, Opera 81+) and Node.js. For older environments, use a polyfill like [urlpattern-polyfill](https://github.com/nicowillis/urlpattern-polyfill).
-
 ## Advanced usage
 
 ### Reactive routes
@@ -206,15 +181,15 @@ You can make routes reactive with reactive systems that support direct assignmen
 import { AppRouter } from 'kr-router';
 import { makeObservable } from 'kr-observable'
 
-const router = new AppRouter({
-  routes: makeObservable({
+const router = new AppRouter(
+  makeObservable({
     userSettings: {
       path: '/users/:id/settings',
       query: {} as { tab?: string },
       loader: () => import('./pages/User'),
     },
-  }),
-});
+  })
+);
 ```
 The `kr-router` mutates the routes object directly. Your reactive system detects these mutations, so your components can react automatically to route changes:
 ```tsx
@@ -239,17 +214,15 @@ This can be useful for apps with microservices. For example, when a host app onl
 import { AppRouter } from 'kr-router';
 
 const router = new AppRouter({
-  routes: {
-    orders: {
-      path: '/orders{/}*?',
-      loader: () => import('https://host.com/orders-federated-app.js'),
-    },
-    dashboards: {
-      path: '/dashboards{/}*?',
-      loader: () => import('https://host.com/dashboards-federated-app.js'),
-    },
+  orders: {
+    path: '/orders{/}*?',
+    loader: () => import('https://host.com/orders-federated-app.js'),
   },
-});
+  dashboards: {
+    path: '/dashboards{/}*?',
+    loader: () => import('https://host.com/dashboards-federated-app.js'),
+  },
+} as const);
 ```
 
 ```ts
@@ -257,15 +230,13 @@ const router = new AppRouter({
 import { AppRouter } from 'kr-router';
 
 const router = new AppRouter({
-  routes: {
-    home: {
-      path: '/orders{/}?',
-      loader: () => import('./OrdersPage'),
-    },
-    order: {
-      path: '/orders/:orderId([0-9]+)',
-      loader: () => import('./OrderDescription'),
-    },
+  home: {
+    path: '/orders{/}?',
+    loader: () => import('./OrdersPage'),
+  },
+  order: {
+    path: '/orders/:orderId([0-9]+)',
+    loader: () => import('./OrderDescription'),
   },
 });
 ```

@@ -1,12 +1,27 @@
 import { RouterConfig, RouterRoutes, RoutePatternResult } from './types.helpers.js';
 
-export class RouteStateChangeEvent<T> extends CustomEvent<T> {
-  state: T;
-  constructor(type: string, detail: T) {
-    super(type, { detail });
+// export class RouteStateChangeEvent<T> extends CustomEvent<T> {
+//   state: T;
+//   constructor(type: string, detail: T) {
+//     super(type, { detail });
+//     this.state = detail;
+//   }
+// }
+
+class RouteStateChangeEvent<K extends keyof C, C extends RouterConfig, S = C[K]> extends CustomEvent<S> {
+  state: S;
+
+  constructor(type: K, detail: S) {
+    super(type as string, { detail });
     this.state = detail;
   }
 }
+
+export type RouteEvent<
+  T extends AppRouter<any>,
+  K extends keyof InferConfig<T>
+> = RouteStateChangeEvent<K, RouterRoutes<InferConfig<T>>>;
+type InferConfig<T extends AppRouter<any>> = T extends AppRouter<infer C> ? C : never;
 
 export class RouteNotFoundEvent extends CustomEvent<boolean> {
   state: boolean
@@ -121,9 +136,15 @@ export class AppRouter<T extends RouterConfig> extends EventTarget {
     options?: boolean | AddEventListenerOptions
   ): void;
 
+  // addEventListener<K extends keyof T>(
+  //   type: K,
+  //   listener: (event: RouteStateChangeEvent<RouterRoutes<T>[K]>) => void,
+  //   options?: boolean | AddEventListenerOptions
+  // ): void;
+
   addEventListener<K extends keyof T>(
     type: K,
-    listener: (event: RouteStateChangeEvent<RouterRoutes<T>[K]>) => void,
+    listener: (event: RouteStateChangeEvent<K, RouterRoutes<T>>) => void,
     options?: boolean | AddEventListenerOptions
   ): void;
 
@@ -135,7 +156,7 @@ export class AppRouter<T extends RouterConfig> extends EventTarget {
 
   addEventListener(
     type: string | keyof T | 'notfound',
-    listener: EventListenerOrEventListenerObject | ((event: RouteNotFoundEvent) => void) | ((event: RouteStateChangeEvent<RouterRoutes<T>[keyof T]>) => void),
+    listener: EventListenerOrEventListenerObject | ((event: RouteNotFoundEvent) => void) | ((event: RouteStateChangeEvent<keyof T, RouterRoutes<T>>) => void),
     options?: boolean | AddEventListenerOptions
   ): void {
     super.addEventListener(type as string, listener as EventListenerOrEventListenerObject, options);
@@ -159,7 +180,7 @@ export class AppRouter<T extends RouterConfig> extends EventTarget {
 
   removeEventListener<K extends keyof T>(
     type: K,
-    listener: (event: RouteStateChangeEvent<RouterRoutes<T>[K]>) => void,
+    listener: (event: RouteStateChangeEvent<K, RouterRoutes<T>>) => void,
     options?: boolean | EventListenerOptions
   ): void;
 
@@ -171,12 +192,28 @@ export class AppRouter<T extends RouterConfig> extends EventTarget {
 
   removeEventListener(
     type: string | keyof T | 'notfound',
-    listener: EventListenerOrEventListenerObject | ((event: RouteNotFoundEvent) => void) | ((event: RouteStateChangeEvent<RouterRoutes<T>[keyof T]>) => void),
+    listener: EventListenerOrEventListenerObject | ((event: RouteNotFoundEvent) => void) | ((event: RouteStateChangeEvent<keyof T, RouterRoutes<T>>) => void),
     options?: boolean | EventListenerOptions
   ): void {
     super.removeEventListener(type as string, listener as EventListenerOrEventListenerObject, options);
   }
 }
+
+
+const c = new AppRouter({
+  foo: {
+    path: '/foo/:bar',
+    loader(): Promise<{ default: any }> {
+      return Promise.resolve({ default: null });
+    }
+  }
+} as const)
+
+c.addEventListener('foo', e => e.state.result?.pathname.groups.bar);
+const h = (e: RouteEvent<typeof c, "foo">) => {
+  e.state.result?.pathname.groups.bar
+}
+
 
 // import type { RoutePatternResult, RouterConfig, RouterRoutes } from './types.helpers.js';
 //
