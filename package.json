@@ -1,6 +1,6 @@
 {
   "name": "kr-router",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "prepare": "husky",
@@ -31,9 +31,6 @@
   "author": "Roman Konstantin",
   "license": "MIT",
   "description": "",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
   "devDependencies": {
     "@espcom/esbuild-plugin-compress": "1.2.0",
     "@espcom/eslint-config": "latest",
@@ -68,5 +65,16 @@
       "require": "./dist/cjs/preact/index.js",
       "import": "./dist/esm/preact/index.js"
     }
-  }
+  },
+  "typesVersions": {
+    "*": {
+      "preact": ["dist/types/preact/index.d.ts"],
+      "react": ["dist/types/react/index.d.ts"]
+    }
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/main/index.d.ts",
+  "react": "dist/cjs/react/index.js",
+  "preact": "dist/cjs/preact/index.js"
 }

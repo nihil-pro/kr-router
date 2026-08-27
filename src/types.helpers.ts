@@ -64,27 +64,7 @@ type QueryOf<T> = T extends { query: infer Q extends Record<string, string | und
   ? Q
   : Record<never, never>;
 
-export interface RouterConfig {
-  routes: Record<string, RouteConfig>;
-
-  /**
-   * Whether the router should automatically intercept and handle clicks on anchor
-   * (`<a>`) elements using client-side navigation.
-   *
-   * When `true` (default), the router calls `preventDefault()` on matching anchor
-   * clicks and handles navigation internally, provided all of the following are true:
-   * - The anchor's origin matches the current `location.origin`
-   * - The anchor has no `target` attribute (e.g., `_blank`)
-   * - The anchor has no `download` attribute
-   * - The click is a standard left-click (no `ctrlKey`, `metaKey`, and `button !== 1`)
-   *
-   * Set to `false` to disable this behavior and handle link navigation manually,
-   * either with a custom `Link` component or by calling `router.navigate()` directly.
-   *
-   * @default true
-   */
-  interceptLinks?: boolean;
-}
+export type RouterConfig = Record<string, RouteConfig>;
 
 
 export interface RoutePatternResult<
@@ -128,5 +108,5 @@ export type RouteState<T extends RouteConfig> =
 
 
 export type RouterRoutes<T extends RouterConfig> = {
-  [K in keyof T['routes']]: RouteState<T['routes'][K]> & RouteConfig & { name: K };
+  [K in keyof T]: RouteState<T[K]> & RouteConfig & { name: K };
 }
